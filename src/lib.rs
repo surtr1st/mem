@@ -18,6 +18,7 @@ pub struct MemorizeBox {
 pub trait MemorizeUtils {
     fn validate_default_path(self) -> Result<(), std::io::Error>;
     fn update(self, content: &Value) -> Result<String, String>;
+    fn collect(self);
 }
 
 impl MemorizeUtils for MemorizeBox {
@@ -39,8 +40,21 @@ impl MemorizeUtils for MemorizeBox {
             Err(e) => panic!("{e}"),
         }
     }
+
+    fn collect(self) {
+        let file_path = MemorizeHelper::use_default_file();
+        let handler = JSONHandler::new(&file_path);
+        let json_content = handler.read_json_from_file();
+        match json_content {
+            Ok(content) => {
+                handler.print_pretty(&content);
+            }
+            Err(e) => panic!("{e}"),
+        }
+    }
 }
 
+#[derive(Clone, Copy)]
 pub struct JSONHandler<'j> {
     file_path: &'j str,
 }
@@ -66,5 +80,11 @@ impl<'j> JSONHandler<'j> {
         let writer = std::io::BufWriter::new(file);
         serde_json::to_writer_pretty(writer, content)?;
         Ok(())
+    }
+
+    pub fn print_pretty(self, content: &Value) {
+        if let Ok(pretty_content) = serde_json::to_string_pretty(&content) {
+            println!("{pretty_content}");
+        }
     }
 }
