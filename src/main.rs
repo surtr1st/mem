@@ -1,5 +1,5 @@
 mod constants;
-use clap::{arg, command, error, Parser, Subcommand};
+use clap::{arg, command, Parser, Subcommand};
 use constants::{DEFAULT_PATH, HOME};
 use std::{env, fs, fs::File, path::Path};
 
@@ -8,29 +8,46 @@ use std::{env, fs, fs::File, path::Path};
 struct Memorize {
     #[command(subcommand)]
     subcommands: Option<MemorizeSubcommands>,
-
-    #[arg(short, long, global = true)]
-    command: String,
-
-    /// Set alias for a command
-    #[arg(short, long, global = true)]
-    alias: String,
 }
 
 #[derive(Subcommand, Debug)]
 enum MemorizeSubcommands {
     /// Adding and memorize command
-    Add,
+    Add {
+        /// Specific command to be memorized
+        #[arg(short, long)]
+        command: String,
+
+        /// Set alias for a command
+        #[arg(short, long)]
+        alias: String,
+    },
     /// Delete the specific memorized command
-    Del,
+    Del {
+        /// Specific command to be memorized
+        #[arg(short, long)]
+        command: String,
+    },
     /// Update the specific memorized command
     Set {
+        /// Specific command to be memorized
+        #[arg(short, long)]
+        command: String,
+
+        /// Set alias for a command
+        #[arg(short, long)]
+        alias: String,
+
         /// Set new value for to be updated command
         #[arg(short, long)]
         to: String,
     },
     /// Execute the target memorized command by its alias
-    Use,
+    Use {
+        /// Set alias for a command
+        #[arg(short, long)]
+        alias: String,
+    },
     /// Show a list of memorized commands and its alias
     List,
 }
@@ -39,10 +56,10 @@ fn main() -> Result<(), String> {
     let mem = Memorize::parse();
 
     match &mem.subcommands {
-        Some(MemorizeSubcommands::Add) => Ok(()),
-        Some(MemorizeSubcommands::Del) => Ok(()),
-        Some(MemorizeSubcommands::Set { to }) => Ok(()),
-        Some(MemorizeSubcommands::Use) => Ok(()),
+        Some(MemorizeSubcommands::Add { .. }) => Ok(()),
+        Some(MemorizeSubcommands::Del { .. }) => Ok(()),
+        Some(MemorizeSubcommands::Set { .. }) => Ok(()),
+        Some(MemorizeSubcommands::Use { .. }) => Ok(()),
         Some(MemorizeSubcommands::List) => Ok(()),
         None => Ok(()),
     }
