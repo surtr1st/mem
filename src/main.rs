@@ -1,14 +1,31 @@
-use clap::{arg, command, Parser};
+use clap::{arg, command, Parser, Subcommand};
 use std::{env, fs, fs::File, path::Path};
 
 #[derive(Parser, Debug)]
-#[command(author, version)]
+#[command(author, version, about, long_about = None)]
 struct Memorize {
     #[arg(short, long)]
     alias: String,
 
     #[arg(short, long)]
     path: std::path::PathBuf,
+
+    #[command(subcommand)]
+    command: MemorizeSubcommands,
+}
+
+#[derive(Subcommand, Debug)]
+enum MemorizeSubcommands {
+    /// Adding and memorize command
+    Add { cmd: String },
+    /// Delete the specific memorized command
+    Del { cmd: String },
+    /// Update the specific memorized command
+    Set { cmd: String },
+    /// Execute the target memorized command by its alias
+    Use { alias: String },
+    /// Show a list of memorized commands and its alias
+    List { list: usize },
 }
 
 const HOME: &str = "HOME";
