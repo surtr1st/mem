@@ -26,19 +26,19 @@ enum MemorizeSubcommands {
     Del {
         /// Specific command to be memorized
         #[arg(short, long)]
-        command: String,
+        command: Option<String>,
     },
     /// Update the specific memorized command
     Set {
         /// Specific command to be memorized
         #[arg(short, long)]
-        command: String,
+        command: Option<String>,
     },
     /// Execute the target memorized command by its alias
     Use {
         /// Set alias for a command
         #[arg(short, long)]
-        alias: String,
+        alias: Option<String>,
     },
     /// Show a list of memorized commands and its alias
     List,
@@ -61,7 +61,14 @@ fn main() -> Result<(), String> {
             };
             Ok(())
         }
-        Some(MemorizeSubcommands::Del { command }) => Ok(()),
+        Some(MemorizeSubcommands::Del { command }) => {
+            let Some(_) = command else {
+                let message =
+                    format!("Please add a specific command rather whitespace or non-command!");
+                return Err(message);
+            };
+            Ok(())
+        }
         Some(MemorizeSubcommands::Set { command }) => Ok(()),
         Some(MemorizeSubcommands::Use { alias }) => Ok(()),
         Some(MemorizeSubcommands::List) => Ok(()),
