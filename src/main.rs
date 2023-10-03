@@ -33,6 +33,16 @@ const DEFAULT_PATH: &str = ".local/share/mem";
 
 fn main() {
     let mem = Memorize::parse();
+    match &mem.command {
+        Some(MemorizeSubcommands::Add { command }) => {
+            println!("Adding... {command}");
+        }
+        Some(MemorizeSubcommands::Del { cmd }) => {}
+        Some(MemorizeSubcommands::Set { cmd }) => {}
+        Some(MemorizeSubcommands::Use { alias }) => {}
+        Some(MemorizeSubcommands::List { list }) => {}
+        None => {}
+    }
 }
 
 pub fn write_into(file_name: &str) -> Result<(), std::io::Error> {
