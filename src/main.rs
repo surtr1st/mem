@@ -4,9 +4,6 @@ use std::{env, fs, fs::File, path::Path};
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Memorize {
-    #[arg(short, long)]
-    alias: Option<String>,
-
     #[command(subcommand)]
     command: Option<MemorizeSubcommands>,
 }
@@ -15,8 +12,13 @@ struct Memorize {
 enum MemorizeSubcommands {
     /// Adding and memorize command
     Add {
+        /// Specific command to be memorized
         #[arg(short, long)]
         command: String,
+
+        /// Set alias for a command
+        #[arg(short, long)]
+        alias: String,
     },
     /// Delete the specific memorized command
     Del { cmd: String },
@@ -34,8 +36,8 @@ const DEFAULT_PATH: &str = ".local/share/mem";
 fn main() {
     let mem = Memorize::parse();
     match &mem.command {
-        Some(MemorizeSubcommands::Add { command }) => {
-            println!("Adding... {command}");
+        Some(MemorizeSubcommands::Add { alias, command }) => {
+            println!("Adding alias={alias} command={command}");
         }
         Some(MemorizeSubcommands::Del { cmd }) => {}
         Some(MemorizeSubcommands::Set { cmd }) => {}
