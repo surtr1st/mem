@@ -1,5 +1,5 @@
 mod subcommands;
-use clap::{command, Parser};
+use clap::{command, error, Parser};
 use subcommands::MemorizeSubcommands;
 
 #[derive(Parser, Debug)]
@@ -9,7 +9,7 @@ struct Memorize {
     subcommands: Option<MemorizeSubcommands>,
 }
 
-fn main() -> Result<(), String> {
+fn main() -> error::Result<()> {
     let mem = Memorize::parse();
 
     match &mem.subcommands {
