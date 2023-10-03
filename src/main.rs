@@ -1,4 +1,6 @@
+mod constants;
 use clap::{arg, command, Parser, Subcommand};
+use constants::{DEFAULT_PATH, HOME};
 use std::{env, fs, fs::File, path::Path};
 
 #[derive(Parser, Debug)]
@@ -41,9 +43,6 @@ enum MemorizeSubcommands {
     /// Show a list of memorized commands and its alias
     List,
 }
-
-const HOME: &str = "HOME";
-const DEFAULT_PATH: &str = ".local/share/mem";
 
 fn main() {
     let mem = Memorize::parse();
