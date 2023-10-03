@@ -16,11 +16,11 @@ enum MemorizeSubcommands {
     Add {
         /// Specific command to be memorized
         #[arg(short, long)]
-        command: String,
+        command: Option<String>,
 
         /// Set alias for a command
         #[arg(short, long)]
-        alias: String,
+        alias: Option<String>,
     },
     /// Delete the specific memorized command
     Del {
@@ -44,17 +44,28 @@ enum MemorizeSubcommands {
     List,
 }
 
-fn main() {
+fn main() -> Result<(), String> {
     let mem = Memorize::parse();
     match &mem.command {
         Some(MemorizeSubcommands::Add { alias, command }) => {
-            println!("Adding alias={alias} command={command}");
+            let Some(_) = alias else {
+                let message = format!(
+                    "Alias for executing command haven't set! For instance `mem add --command env $HOME --alias ehe`"
+                );
+                return Err(message);
+            };
+            let Some(_) = command else {
+                let message =
+                    format!("Please add a specific command rather whitespace or non-command!");
+                return Err(message);
+            };
+            Ok(())
         }
-        Some(MemorizeSubcommands::Del { command }) => {}
-        Some(MemorizeSubcommands::Set { command }) => {}
-        Some(MemorizeSubcommands::Use { alias }) => {}
-        Some(MemorizeSubcommands::List) => {}
-        None => {}
+        Some(MemorizeSubcommands::Del { command }) => Ok(()),
+        Some(MemorizeSubcommands::Set { command }) => Ok(()),
+        Some(MemorizeSubcommands::Use { alias }) => Ok(()),
+        Some(MemorizeSubcommands::List) => Ok(()),
+        None => Ok(()),
     }
 }
 
