@@ -1,16 +1,28 @@
-use clap::Parser;
+use clap::{arg, command, Parser};
 use std::{env, fs, fs::File, path::Path};
 
-#[derive(Parser)]
-struct Cli {
-    pattern: String,
+#[derive(Parser, Debug)]
+#[command(author, version)]
+struct Memorize {
+    #[arg(short, long)]
+    alias: String,
+
+    #[arg(short, long)]
     path: std::path::PathBuf,
 }
 
 const HOME: &str = "HOME";
 const DEFAULT_PATH: &str = ".local/share/mem";
 
-fn main() {}
+fn main() {
+    let args = Memorize::parse();
+    let file_name = args.path.file_name().unwrap().to_string_lossy().to_string();
+    let file_content = fs::read_to_string(args.path)
+        .expect(&format!("should been read the content of {}", &file_name));
+    for content in file_content.lines() {
+        println!("{content}");
+    }
+}
 
 pub fn write_into(file_name: &str) -> Result<(), std::io::Error> {
     let home_dir = env::var(HOME).expect("should been read `HOME` value");
