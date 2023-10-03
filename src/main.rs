@@ -7,9 +7,6 @@ struct Memorize {
     #[arg(short, long)]
     alias: String,
 
-    #[arg(short, long)]
-    path: std::path::PathBuf,
-
     #[command(subcommand)]
     command: MemorizeSubcommands,
 }
@@ -33,12 +30,6 @@ const DEFAULT_PATH: &str = ".local/share/mem";
 
 fn main() {
     let args = Memorize::parse();
-    let file_name = args.path.file_name().unwrap().to_string_lossy().to_string();
-    let file_content = fs::read_to_string(args.path)
-        .expect(&format!("should been read the content of {}", &file_name));
-    for content in file_content.lines() {
-        println!("{content}");
-    }
 }
 
 pub fn write_into(file_name: &str) -> Result<(), std::io::Error> {
