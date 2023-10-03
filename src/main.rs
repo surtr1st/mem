@@ -21,13 +21,25 @@ enum MemorizeSubcommands {
         alias: String,
     },
     /// Delete the specific memorized command
-    Del { cmd: String },
+    Del {
+        /// Specific command to be memorized
+        #[arg(short, long)]
+        command: String,
+    },
     /// Update the specific memorized command
-    Set { cmd: String },
+    Set {
+        /// Specific command to be memorized
+        #[arg(short, long)]
+        command: String,
+    },
     /// Execute the target memorized command by its alias
-    Use { alias: String },
+    Use {
+        /// Set alias for a command
+        #[arg(short, long)]
+        alias: String,
+    },
     /// Show a list of memorized commands and its alias
-    List { list: usize },
+    List,
 }
 
 const HOME: &str = "HOME";
@@ -39,10 +51,10 @@ fn main() {
         Some(MemorizeSubcommands::Add { alias, command }) => {
             println!("Adding alias={alias} command={command}");
         }
-        Some(MemorizeSubcommands::Del { cmd }) => {}
-        Some(MemorizeSubcommands::Set { cmd }) => {}
+        Some(MemorizeSubcommands::Del { command }) => {}
+        Some(MemorizeSubcommands::Set { command }) => {}
         Some(MemorizeSubcommands::Use { alias }) => {}
-        Some(MemorizeSubcommands::List { list }) => {}
+        Some(MemorizeSubcommands::List) => {}
         None => {}
     }
 }
