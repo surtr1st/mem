@@ -5,16 +5,19 @@ use std::{env, fs, fs::File, path::Path};
 #[command(author, version, about, long_about = None)]
 struct Memorize {
     #[arg(short, long)]
-    alias: String,
+    alias: Option<String>,
 
     #[command(subcommand)]
-    command: MemorizeSubcommands,
+    command: Option<MemorizeSubcommands>,
 }
 
 #[derive(Subcommand, Debug)]
 enum MemorizeSubcommands {
     /// Adding and memorize command
-    Add { cmd: String },
+    Add {
+        #[arg(short, long)]
+        command: String,
+    },
     /// Delete the specific memorized command
     Del { cmd: String },
     /// Update the specific memorized command
@@ -29,7 +32,7 @@ const HOME: &str = "HOME";
 const DEFAULT_PATH: &str = ".local/share/mem";
 
 fn main() {
-    let args = Memorize::parse();
+    let mem = Memorize::parse();
 }
 
 pub fn write_into(file_name: &str) -> Result<(), std::io::Error> {
