@@ -33,6 +33,14 @@ enum MemorizeSubcommands {
         /// Specific command to be memorized
         #[arg(short, long)]
         command: Option<String>,
+
+        /// Set alias for a command
+        #[arg(short, long)]
+        alias: Option<String>,
+
+        /// Set new value for to be updated command
+        #[arg(short, long)]
+        to: Option<String>,
     },
     /// Execute the target memorized command by its alias
     Use {
@@ -64,13 +72,37 @@ fn main() -> Result<(), String> {
         Some(MemorizeSubcommands::Del { command }) => {
             let Some(_) = command else {
                 let message =
-                    format!("Please add a specific command rather whitespace or non-command!");
+                    format!("Please choose a specific command rather whitespace or non-command!");
                 return Err(message);
             };
             Ok(())
         }
-        Some(MemorizeSubcommands::Set { command }) => Ok(()),
-        Some(MemorizeSubcommands::Use { alias }) => Ok(()),
+        Some(MemorizeSubcommands::Set { command, alias, to }) => {
+            let Some(_) = command else {
+                let message =
+                    format!("Please choose a specific command rather whitespace or non-command!");
+                return Err(message);
+            };
+            let Some(_) = to else {
+                let message =
+                    format!("Please set some value to it rather whitespace or non-command!");
+                return Err(message);
+            };
+            if let Some(a) = alias {
+                if a.is_empty() {
+                    let message = format!("Alias for executing command should not be empty!");
+                    return Err(message);
+                }
+            }
+            Ok(())
+        }
+        Some(MemorizeSubcommands::Use { alias }) => {
+            let Some(_) = alias else {
+                let message = format!("You haven't choose which alias (command) to be executed!");
+                return Err(message);
+            };
+            Ok(())
+        }
         Some(MemorizeSubcommands::List) => Ok(()),
         None => Ok(()),
     }
