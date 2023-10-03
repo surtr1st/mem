@@ -1,9 +1,10 @@
 mod constants;
-use constants::{DEFAULT_PATH, HOME};
+mod helpers;
+use helpers::MemorizeHelper;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{
-    env, fs,
+    fs,
     fs::{File, OpenOptions},
     path::Path,
 };
@@ -15,15 +16,14 @@ pub struct MemorizeBox {
 }
 
 pub trait MemorizeUtils {
-    fn validate_default_path(self, file_name: &str) -> Result<(), std::io::Error>;
+    fn validate_default_path(self) -> Result<(), std::io::Error>;
     fn update(self, content: &str) -> Result<String, String>;
 }
 
 impl MemorizeUtils for MemorizeBox {
-    fn validate_default_path(self, file_name: &str) -> Result<(), std::io::Error> {
-        let home_dir = env::var(HOME).expect("should been read `HOME` value");
-        let path = format!("{home_dir}/{DEFAULT_PATH}");
-        let file_path = format!("{home_dir}/{DEFAULT_PATH}/{file_name}");
+    fn validate_default_path(self) -> Result<(), std::io::Error> {
+        let path = MemorizeHelper::use_default_path();
+        let file_path = MemorizeHelper::use_default_file();
         if !Path::new(&path).is_dir() {
             fs::create_dir(&path)?;
         }
