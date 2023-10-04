@@ -38,7 +38,7 @@ impl MemorizeUtils {
         Ok(())
     }
 
-    pub fn update(content: &MemorizeBox) -> Result<()> {
+    pub fn add(content: &MemorizeBox) -> Result<()> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
         if !handler.is_unique(&content.alias) {

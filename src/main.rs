@@ -22,7 +22,7 @@ fn main() -> Result<()> {
                 alias: alias.to_string(),
                 command: command.to_string(),
             };
-            MemorizeUtils::update(&memo_box)?;
+            MemorizeUtils::add(&memo_box)?;
             Ok(())
         }
         Some(MemorizeSubcommands::Del { .. }) => Ok(()),
