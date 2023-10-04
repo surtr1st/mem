@@ -84,7 +84,7 @@ impl MemorizeUtils {
         Ok(())
     }
 
-    pub fn invoke_command(alias: &str, value: &str) -> Result<()> {
+    pub fn invoke_command(alias: &str, value: &Option<String>) -> Result<()> {
         let handler = Self::use_json_handler();
         let list = handler.read_json_from_file()?;
         if let Some(index) = list.iter().position(|item| item.alias == alias) {
@@ -95,8 +95,10 @@ impl MemorizeUtils {
                 for arg in excluded_first_element {
                     command.arg(arg);
                 }
+                if let Some(v) = value {
+                    command.arg(v);
+                }
                 command
-                    .arg(value)
                     .spawn()
                     .with_context(|| format!("Failed to execute command: `{}`", &memo.command))?;
             }

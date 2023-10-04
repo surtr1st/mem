@@ -14,6 +14,9 @@ struct Memorize {
 
     #[command(flatten)]
     options: GlobalArgs,
+
+    /// Executing a memorized command
+    x: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -23,6 +26,15 @@ fn main() -> Result<()> {
 
     let alias = mem.options.alias;
     let command = mem.options.command;
+    let exec = mem.x;
+
+    if let Some(_) = exec {
+        let Some(a) = &alias else {
+            return Err(Error::msg("You haven't choose a (an) alias/command!"));
+        };
+        MemorizeUtils::invoke_command(&a, &None)?;
+        return Ok(());
+    }
 
     match &mem.subcommands {
         Some(MemorizeSubcommands::Add) => {
@@ -63,15 +75,21 @@ fn main() -> Result<()> {
         }
         Some(MemorizeSubcommands::Use { value }) => {
             let Some(a) = alias else {
-                return Err(Error::msg("Alias is empty!"));
+                return Err(Error::msg("You haven't choose a (an) alias/command!"));
             };
-            MemorizeUtils::invoke_command(&a, value)?;
+            MemorizeUtils::invoke_command(&a, &value)?;
             Ok(())
         }
         Some(MemorizeSubcommands::List) => {
             MemorizeUtils::collect()?;
             Ok(())
         }
-        None => Ok(()),
+        None => {
+            let Some(a) = alias else {
+                return Err(Error::msg("You haven't choose a (an) alias/command!"));
+            };
+            MemorizeUtils::invoke_command(&a, &None)?;
+            Ok(())
+        }
     }
 }

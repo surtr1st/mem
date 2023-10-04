@@ -20,11 +20,10 @@ pub enum MemorizeSubcommands {
         new_command: Option<String>,
     },
     /// Execute the target memorized command by its alias
-    #[command(arg_required_else_help = true)]
     Use {
         /// Set value for a command
         #[arg(short = 'v', long)]
-        value: String,
+        value: Option<String>,
     },
     /// Show a list of memorized commands and its alias
     List,
@@ -33,10 +32,8 @@ pub enum MemorizeSubcommands {
 #[derive(Args, Debug)]
 pub struct GlobalArgs {
     /// Specific command to be memorized
-    #[arg(short, long, global = true)]
     pub command: Option<String>,
 
     /// Set alias for a command
-    #[arg(short, long, global = true)]
     pub alias: Option<String>,
 }
