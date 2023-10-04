@@ -1,4 +1,5 @@
 mod subcommands;
+use anyhow::Result;
 use clap::{command, Parser};
 use mem::{MemorizeBox, MemorizeUtils};
 use subcommands::MemorizeSubcommands;
@@ -10,7 +11,7 @@ struct Memorize {
     subcommands: Option<MemorizeSubcommands>,
 }
 
-fn main() -> Result<(), String> {
+fn main() -> Result<()> {
     let mem = Memorize::parse();
 
     MemorizeUtils::validate_default_path()?;
