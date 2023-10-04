@@ -27,7 +27,10 @@ fn main() -> Result<(), String> {
         Some(MemorizeSubcommands::Del { .. }) => Ok(()),
         Some(MemorizeSubcommands::Set { .. }) => Ok(()),
         Some(MemorizeSubcommands::Use { .. }) => Ok(()),
-        Some(MemorizeSubcommands::List) => Ok(()),
+        Some(MemorizeSubcommands::List) => {
+            MemorizeUtils::collect()?;
+            Ok(())
+        }
         None => Ok(()),
     }
 }

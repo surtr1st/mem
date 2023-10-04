@@ -49,10 +49,12 @@ impl MemorizeUtils {
         }
     }
 
-    pub fn collect() -> Result<(), Box<dyn std::error::Error>> {
+    pub fn collect() -> Result<(), String> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
-        let list = handler.read_json_from_file()?;
+        let list = handler
+            .read_json_from_file()
+            .expect("should read content from file");
 
         println!("ALIAS\tCOMMAND");
         list.iter()
