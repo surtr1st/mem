@@ -6,9 +6,9 @@ use handler::JSONHandler;
 use helpers::MemorizeHelper;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::{fs, fs::File, io::Write, path::Path};
+use std::{fs, fs::File, io::Write, path::Path, process::Command};
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MemorizeBox {
     pub alias: String,
     pub command: String,
@@ -82,6 +82,26 @@ impl MemorizeUtils {
             let body = format!("{:<20}\t{:<20}", item.alias, item.command);
             println!("{}", body);
         });
+        Ok(())
+    }
+
+    pub fn invoke_command(alias: &str) -> Result<()> {
+        let file_path = MemorizeHelper::use_default_file();
+        let handler = JSONHandler::new(&file_path);
+        let list = handler.read_json_from_file()?;
+        if let Some(index) = list.iter().position(|item| item.alias == alias) {
+            if let Some(memo) = list.get(index) {
+                let separated_parts = memo.command.split(" ").collect::<Vec<_>>();
+                let mut command = Command::new(&separated_parts[0]);
+                let excluded_first_element: Vec<_> = separated_parts.iter().skip(1).collect();
+                for arg in excluded_first_element {
+                    command.arg(arg);
+                }
+                command
+                    .spawn()
+                    .with_context(|| format!("Failed to execute command: `{}`", &memo.command))?;
+            }
+        }
         Ok(())
     }
 }

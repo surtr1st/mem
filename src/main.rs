@@ -48,7 +48,10 @@ fn main() -> Result<()> {
 
             Ok(())
         }
-        Some(MemorizeSubcommands::Use { .. }) => Ok(()),
+        Some(MemorizeSubcommands::Use { alias }) => {
+            MemorizeUtils::invoke_command(&alias)?;
+            Ok(())
+        }
         Some(MemorizeSubcommands::List) => {
             MemorizeUtils::collect()?;
             Ok(())
