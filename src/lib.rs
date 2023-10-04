@@ -55,6 +55,13 @@ impl MemorizeUtils {
         Ok(())
     }
 
+    pub fn update_command_by_alias(target: &str, new_value: &str) -> Result<()> {
+        let file_path = MemorizeHelper::use_default_file();
+        let handler = JSONHandler::new(&file_path);
+        handler.modify_command_by_alias(target, new_value)?;
+        Ok(())
+    }
+
     pub fn collect() -> Result<()> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
