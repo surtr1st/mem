@@ -1,12 +1,15 @@
-use clap::{arg, Args, Subcommand};
+use clap::{arg, command, Args, Subcommand};
 
 #[derive(Subcommand, Debug)]
 pub enum MemorizeSubcommands {
     /// Adding and memorize command
+    #[command(arg_required_else_help = true)]
     Add,
     /// Delete the specific memorized command
+    #[command(arg_required_else_help = true)]
     Del,
     /// Update the specific memorized command
+    #[command(arg_required_else_help = true)]
     Set {
         /// Set new value for alias
         #[arg(short = 'n', long)]
@@ -17,6 +20,7 @@ pub enum MemorizeSubcommands {
         new_command: Option<String>,
     },
     /// Execute the target memorized command by its alias
+    #[command(arg_required_else_help = true)]
     Use {
         /// Set value for a command
         #[arg(short = 'v', long)]
