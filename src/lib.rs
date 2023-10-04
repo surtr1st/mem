@@ -4,7 +4,8 @@ mod helpers;
 use handler::JSONHandler;
 use helpers::MemorizeHelper;
 use serde::{Deserialize, Serialize};
-use std::{fs, fs::File, path::Path};
+use serde_json::json;
+use std::{fs, fs::File, io::Write, path::Path};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct MemorizeBox {
@@ -22,10 +23,17 @@ impl MemorizeUtils for MemorizeBox {
     fn validate_default_path() -> Result<(), std::io::Error> {
         let path = MemorizeHelper::use_default_path();
         let file_path = MemorizeHelper::use_default_file();
+
         if !Path::new(&path).is_dir() {
             fs::create_dir(&path)?;
         }
-        File::create(file_path)?;
+
+        if !Path::new(&file_path).exists() {
+            let empty_array = json!([]);
+            let mut created_file = File::create(file_path)?;
+            created_file.write_all(empty_array.to_string().as_bytes())?;
+        }
+
         Ok(())
     }
 
