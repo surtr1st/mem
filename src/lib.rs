@@ -55,9 +55,12 @@ impl MemorizeUtils {
             .read_json_from_file()
             .with_context(|| "could not read conten from file")?;
 
-        println!("ALIAS\tCOMMAND");
-        list.iter()
-            .for_each(|item| println!("{}\t{}", item.alias, item.command));
+        let header = MemorizeHelper::use_left_aligned(vec!["ALIAS", "COMMAND"]);
+        println!("{}", header);
+        list.iter().for_each(|item| {
+            let body = format!("{:<20}\t{:<20}", item.alias, item.command);
+            println!("{}", body);
+        });
         Ok(())
     }
 }

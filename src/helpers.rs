@@ -17,4 +17,12 @@ impl MemorizeHelper {
         let home_dir = Self::use_env(HOME);
         format!("{home_dir}/{DEFAULT_PATH}/{DEFAULT_FILE}")
     }
+
+    pub fn use_left_aligned(items: Vec<&str>) -> String {
+        let mut formatted = String::new();
+        for item in items {
+            formatted += &format!("{:<20}\t", item);
+        }
+        format!("{}", formatted,)
+    }
 }
