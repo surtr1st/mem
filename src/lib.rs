@@ -15,7 +15,7 @@ pub struct MemorizeBox {
 
 pub trait MemorizeUtils {
     fn validate_default_path() -> Result<(), std::io::Error>;
-    fn update(content: &MemorizeBox) -> Result<String, String>;
+    fn update(content: &MemorizeBox) -> Result<(), std::io::Error>;
     fn collect() -> Result<(), Box<dyn std::error::Error>>;
 }
 
@@ -37,11 +37,11 @@ impl MemorizeUtils for MemorizeBox {
         Ok(())
     }
 
-    fn update(content: &MemorizeBox) -> Result<String, String> {
+    fn update(content: &MemorizeBox) -> Result<(), std::io::Error> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
         match handler.write_into_json(content) {
-            Ok(_) => Ok(String::from("Modified")),
+            Ok(_) => Ok(()),
             Err(e) => panic!("{e}"),
         }
     }
