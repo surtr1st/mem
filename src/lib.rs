@@ -6,7 +6,7 @@ use handler::JSONHandler;
 use helpers::MemorizeHelper;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::{fs, fs::File, io::Write, path::Path, process::Command};
+use std::{fs, fs::File, io::Write, path::Path, process::Command, rc::Rc};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MemorizeBox {
@@ -17,6 +17,10 @@ pub struct MemorizeBox {
 pub struct MemorizeUtils;
 
 impl MemorizeUtils {
+    fn use_json_handler() -> Rc<JSONHandler> {
+        Rc::new(JSONHandler::new(MemorizeHelper::use_default_file()))
+    }
+
     pub fn validate_default_path() -> Result<()> {
         let path = MemorizeHelper::use_default_path();
         let file_path = MemorizeHelper::use_default_file();
@@ -39,8 +43,7 @@ impl MemorizeUtils {
     }
 
     pub fn add(content: &MemorizeBox) -> Result<()> {
-        let file_path = MemorizeHelper::use_default_file();
-        let handler = JSONHandler::new(&file_path);
+        let handler = Self::use_json_handler();
         if !handler.is_unique(&content.alias) {
             return Err(Error::msg("Alias existed! Please set another alias!"));
         }
@@ -49,29 +52,25 @@ impl MemorizeUtils {
     }
 
     pub fn update_by_alias(target: &str, new_value: &str) -> Result<()> {
-        let file_path = MemorizeHelper::use_default_file();
-        let handler = JSONHandler::new(&file_path);
+        let handler = Self::use_json_handler();
         handler.modify_by_alias(target, new_value)?;
         Ok(())
     }
 
     pub fn update_command_by_alias(target: &str, new_value: &str) -> Result<()> {
-        let file_path = MemorizeHelper::use_default_file();
-        let handler = JSONHandler::new(&file_path);
+        let handler = Self::use_json_handler();
         handler.modify_command_by_alias(target, new_value)?;
         Ok(())
     }
 
     pub fn delete_command_by_alias(target: &str) -> Result<()> {
-        let file_path = MemorizeHelper::use_default_file();
-        let handler = JSONHandler::new(&file_path);
+        let handler = Self::use_json_handler();
         handler.delete_property_by_alias(target)?;
         Ok(())
     }
 
     pub fn collect() -> Result<()> {
-        let file_path = MemorizeHelper::use_default_file();
-        let handler = JSONHandler::new(&file_path);
+        let handler = Self::use_json_handler();
         let list = handler
             .read_json_from_file()
             .with_context(|| "could not read conten from file")?;
@@ -85,9 +84,8 @@ impl MemorizeUtils {
         Ok(())
     }
 
-    pub fn invoke_command(alias: &str) -> Result<()> {
-        let file_path = MemorizeHelper::use_default_file();
-        let handler = JSONHandler::new(&file_path);
+    pub fn invoke_command(alias: &str, value: &str) -> Result<()> {
+        let handler = Self::use_json_handler();
         let list = handler.read_json_from_file()?;
         if let Some(index) = list.iter().position(|item| item.alias == alias) {
             if let Some(memo) = list.get(index) {
@@ -98,6 +96,7 @@ impl MemorizeUtils {
                     command.arg(arg);
                 }
                 command
+                    .arg(value)
                     .spawn()
                     .with_context(|| format!("Failed to execute command: `{}`", &memo.command))?;
             }
