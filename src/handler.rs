@@ -46,7 +46,6 @@ impl<'j> JSONHandler<'j> {
         if let Ok(list) = json {
             for item in list {
                 if item.alias == key {
-                    eprintln!("Existed alias! Please set another alias.");
                     return false;
                 }
             }
