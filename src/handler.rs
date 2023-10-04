@@ -40,4 +40,17 @@ impl<'j> JSONHandler<'j> {
         file.write_all(updated_content.as_bytes())?;
         Ok(())
     }
+
+    pub fn is_unique(self, key: &str) -> bool {
+        let json = self.read_json_from_file();
+        if let Ok(list) = json {
+            for item in list {
+                if item.alias == key {
+                    eprintln!("Existed alias! Please set another alias.");
+                    return false;
+                }
+            }
+        }
+        true
+    }
 }
