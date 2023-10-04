@@ -35,21 +35,15 @@ fn main() -> Result<()> {
             new_command,
         }) => {
             if let Some(na) = new_alias {
-                if let Some(a) = alias {
-                    MemorizeUtils::update_by_alias(a, na)?;
-                }
+                MemorizeUtils::update_by_alias(&alias, na)?;
             }
-
             if let Some(nc) = new_command {
-                if let Some(a) = alias {
-                    MemorizeUtils::update_command_by_alias(a, nc)?;
-                }
+                MemorizeUtils::update_command_by_alias(&alias, nc)?;
             }
-
             Ok(())
         }
-        Some(MemorizeSubcommands::Use { alias }) => {
-            MemorizeUtils::invoke_command(&alias)?;
+        Some(MemorizeSubcommands::Use { alias, value }) => {
+            MemorizeUtils::invoke_command(&alias, value)?;
             Ok(())
         }
         Some(MemorizeSubcommands::List) => {

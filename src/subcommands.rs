@@ -1,6 +1,7 @@
 use clap::{arg, Subcommand};
+use structopt::StructOpt;
 
-#[derive(Subcommand, Debug)]
+#[derive(StructOpt, Subcommand, Debug)]
 pub enum MemorizeSubcommands {
     /// Adding and memorize command
     Add {
@@ -22,7 +23,7 @@ pub enum MemorizeSubcommands {
     Set {
         /// Set alias for a command
         #[arg(short, long)]
-        alias: Option<String>,
+        alias: String,
 
         /// Set new value for alias
         #[arg(short = 'n', long)]
@@ -35,8 +36,11 @@ pub enum MemorizeSubcommands {
     /// Execute the target memorized command by its alias
     Use {
         /// Set alias for a command
-        #[arg(short, long)]
         alias: String,
+
+        /// Set value for a command
+        #[arg(short = 'v', long)]
+        value: String,
     },
     /// Show a list of memorized commands and its alias
     List,
