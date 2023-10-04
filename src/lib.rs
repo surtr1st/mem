@@ -16,13 +16,13 @@ pub struct MemorizeBox {
 }
 
 pub trait MemorizeUtils {
-    fn validate_default_path(self) -> Result<(), std::io::Error>;
-    fn update(self, content: &Value) -> Result<String, String>;
-    fn collect(self);
+    fn validate_default_path() -> Result<(), std::io::Error>;
+    fn update(content: &Value) -> Result<String, String>;
+    fn collect() -> Result<(), Box<dyn std::error::Error>>;
 }
 
 impl MemorizeUtils for MemorizeBox {
-    fn validate_default_path(self) -> Result<(), std::io::Error> {
+    fn validate_default_path() -> Result<(), std::io::Error> {
         let path = MemorizeHelper::use_default_path();
         let file_path = MemorizeHelper::use_default_file();
         if !Path::new(&path).is_dir() {
@@ -32,7 +32,7 @@ impl MemorizeUtils for MemorizeBox {
         Ok(())
     }
 
-    fn update(self, content: &Value) -> Result<String, String> {
+    fn update(content: &Value) -> Result<String, String> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
         match handler.write_into_json(content) {
@@ -41,16 +41,21 @@ impl MemorizeUtils for MemorizeBox {
         }
     }
 
-    fn collect(self) {
+    fn collect() -> Result<(), Box<dyn std::error::Error>> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
-        let json_content = handler.read_json_from_file();
-        match json_content {
-            Ok(content) => {
-                handler.print_pretty(&content);
-            }
-            Err(e) => panic!("{e}"),
+        let json_content = handler.read_json_from_file()?;
+        let unwrap_list = json_content
+            .iter()
+            .map(|value| serde_json::from_value(value.clone()))
+            .collect::<Result<Vec<MemorizeBox>, serde_json::Error>>();
+
+        println!("ALIAS\tCOMMAND");
+        if let Ok(list) = unwrap_list {
+            list.iter()
+                .for_each(|item| println!("{}\t{}", item.alias, item.command));
         }
+        Ok(())
     }
 }
 
@@ -64,7 +69,7 @@ impl<'j> JSONHandler<'j> {
         JSONHandler { file_path }
     }
 
-    pub fn read_json_from_file(self) -> Result<Value, std::io::Error> {
+    pub fn read_json_from_file(self) -> Result<Vec<Value>, std::io::Error> {
         let file = File::open(self.file_path)?;
         let reader = std::io::BufReader::new(file);
         let content = serde_json::from_reader(reader)?;
@@ -80,11 +85,5 @@ impl<'j> JSONHandler<'j> {
         let writer = std::io::BufWriter::new(file);
         serde_json::to_writer_pretty(writer, content)?;
         Ok(())
-    }
-
-    pub fn print_pretty(self, content: &Value) {
-        if let Ok(pretty_content) = serde_json::to_string_pretty(&content) {
-            println!("{pretty_content}");
-        }
     }
 }
