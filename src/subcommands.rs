@@ -22,15 +22,15 @@ pub enum MemorizeSubcommands {
     Set {
         /// Specific command to be memorized
         #[arg(short, long)]
-        command: String,
+        command: Option<String>,
 
         /// Set alias for a command
         #[arg(short, long)]
-        alias: String,
+        alias: Option<String>,
 
         /// Set new value for to be updated command
         #[arg(short, long)]
-        to: String,
+        with_value: Option<String>,
     },
     /// Execute the target memorized command by its alias
     Use {

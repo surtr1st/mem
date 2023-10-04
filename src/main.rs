@@ -26,7 +26,20 @@ fn main() -> Result<()> {
             Ok(())
         }
         Some(MemorizeSubcommands::Del { .. }) => Ok(()),
-        Some(MemorizeSubcommands::Set { .. }) => Ok(()),
+        Some(MemorizeSubcommands::Set {
+            alias,
+            command,
+            with_value,
+        }) => {
+            if let Some(w) = with_value {
+                if let Some(a) = alias {
+                    MemorizeUtils::update_by_alias(a, w)?;
+                }
+                if let Some(_) = command {}
+            }
+
+            Ok(())
+        }
         Some(MemorizeSubcommands::Use { .. }) => Ok(()),
         Some(MemorizeSubcommands::List) => {
             MemorizeUtils::collect()?;
