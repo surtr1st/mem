@@ -25,7 +25,10 @@ fn main() -> Result<()> {
             MemorizeUtils::add(&memo_box)?;
             Ok(())
         }
-        Some(MemorizeSubcommands::Del { .. }) => Ok(()),
+        Some(MemorizeSubcommands::Del { alias }) => {
+            MemorizeUtils::delete_command_by_alias(&alias)?;
+            Ok(())
+        }
         Some(MemorizeSubcommands::Set {
             alias,
             new_alias,

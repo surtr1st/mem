@@ -16,7 +16,7 @@ pub enum MemorizeSubcommands {
     Del {
         /// Specific command to be memorized
         #[arg(short, long)]
-        command: String,
+        alias: String,
     },
     /// Update the specific memorized command
     Set {

@@ -62,6 +62,13 @@ impl MemorizeUtils {
         Ok(())
     }
 
+    pub fn delete_command_by_alias(target: &str) -> Result<()> {
+        let file_path = MemorizeHelper::use_default_file();
+        let handler = JSONHandler::new(&file_path);
+        handler.delete_property_by_alias(target)?;
+        Ok(())
+    }
+
     pub fn collect() -> Result<()> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
