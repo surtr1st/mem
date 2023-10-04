@@ -4,7 +4,6 @@ mod helpers;
 use handler::JSONHandler;
 use helpers::MemorizeHelper;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::{fs, fs::File, path::Path};
 
 #[derive(Serialize, Deserialize)]
@@ -15,7 +14,7 @@ pub struct MemorizeBox {
 
 pub trait MemorizeUtils {
     fn validate_default_path() -> Result<(), std::io::Error>;
-    fn update(content: &Value) -> Result<String, String>;
+    fn update(content: &MemorizeBox) -> Result<String, String>;
     fn collect() -> Result<(), Box<dyn std::error::Error>>;
 }
 
@@ -30,7 +29,7 @@ impl MemorizeUtils for MemorizeBox {
         Ok(())
     }
 
-    fn update(content: &Value) -> Result<String, String> {
+    fn update(content: &MemorizeBox) -> Result<String, String> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
         match handler.write_into_json(content) {
@@ -42,17 +41,11 @@ impl MemorizeUtils for MemorizeBox {
     fn collect() -> Result<(), Box<dyn std::error::Error>> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
-        let json_content = handler.read_json_from_file()?;
-        let unwrap_list = json_content
-            .iter()
-            .map(|value| serde_json::from_value(value.clone()))
-            .collect::<Result<Vec<MemorizeBox>, serde_json::Error>>();
+        let list = handler.read_json_from_file()?;
 
         println!("ALIAS\tCOMMAND");
-        if let Ok(list) = unwrap_list {
-            list.iter()
-                .for_each(|item| println!("{}\t{}", item.alias, item.command));
-        }
+        list.iter()
+            .for_each(|item| println!("{}\t{}", item.alias, item.command));
         Ok(())
     }
 }
