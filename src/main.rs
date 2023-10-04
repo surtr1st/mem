@@ -1,5 +1,5 @@
 mod subcommands;
-use clap::{command, error, Parser};
+use clap::{command, Parser};
 use mem::{MemorizeBox, MemorizeUtils};
 use subcommands::MemorizeSubcommands;
 
@@ -10,7 +10,7 @@ struct Memorize {
     subcommands: Option<MemorizeSubcommands>,
 }
 
-fn main() -> error::Result<()> {
+fn main() -> Result<(), String> {
     let mem = Memorize::parse();
 
     MemorizeUtils::validate_default_path()?;
