@@ -1,7 +1,6 @@
 use clap::{arg, Subcommand};
-use structopt::StructOpt;
 
-#[derive(StructOpt, Subcommand, Debug)]
+#[derive(Subcommand, Debug)]
 pub enum MemorizeSubcommands {
     /// Adding and memorize command
     Add {
