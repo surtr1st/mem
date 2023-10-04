@@ -1,7 +1,5 @@
-use std::{
-    fs::{File, OpenOptions},
-    io::{Read, Write},
-};
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Seek, SeekFrom, Write};
 
 use crate::MemorizeBox;
 
@@ -37,8 +35,9 @@ impl<'j> JSONHandler<'j> {
         memorize_boxes.push(content.clone());
 
         let updated_content = serde_json::to_string_pretty(&memorize_boxes)?;
-        let mut writer = std::io::BufWriter::new(file);
-        writer.write_all(updated_content.as_bytes())?;
+        file.seek(SeekFrom::Start(0))?;
+        file.set_len(updated_content.len() as u64)?;
+        file.write_all(updated_content.as_bytes())?;
         Ok(())
     }
 }
