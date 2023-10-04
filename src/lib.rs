@@ -5,7 +5,12 @@ use handler::JSONHandler;
 use helpers::MemorizeHelper;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::{fs, fs::File, io::Write, path::Path};
+use std::{
+    fs,
+    fs::File,
+    io::{Error, ErrorKind, Write},
+    path::Path,
+};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct MemorizeBox {
@@ -36,9 +41,15 @@ impl MemorizeUtils {
     pub fn update(content: &MemorizeBox) -> Result<(), std::io::Error> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
+        if !handler.is_unique(&content.alias) {
+            return Err(Error::new(
+                ErrorKind::AlreadyExists,
+                "Alias existed! Please set another alias!",
+            ));
+        }
         match handler.write_into_json(content) {
             Ok(_) => Ok(()),
-            Err(e) => panic!("{e}"),
+            Err(e) => Err(Error::new(ErrorKind::UnexpectedEof, e)),
         }
     }
 
