@@ -1,57 +1,106 @@
 mod constants;
 mod handler;
 mod helpers;
+use anyhow::{Context, Error, Result};
 use handler::JSONHandler;
 use helpers::MemorizeHelper;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::{fs, fs::File, path::Path};
+use serde_json::json;
+use std::{fs, fs::File, io::Write, path::Path, process::Command};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MemorizeBox {
     pub alias: String,
     pub command: String,
 }
 
-pub trait MemorizeUtils {
-    fn validate_default_path() -> Result<(), std::io::Error>;
-    fn update(content: &Value) -> Result<String, String>;
-    fn collect() -> Result<(), Box<dyn std::error::Error>>;
-}
+pub struct MemorizeUtils;
 
-impl MemorizeUtils for MemorizeBox {
-    fn validate_default_path() -> Result<(), std::io::Error> {
+impl MemorizeUtils {
+    pub fn validate_default_path() -> Result<()> {
         let path = MemorizeHelper::use_default_path();
         let file_path = MemorizeHelper::use_default_file();
+
         if !Path::new(&path).is_dir() {
-            fs::create_dir(&path)?;
+            let message = format!("could not create within the directory: {path}");
+            fs::create_dir(&path).with_context(|| message)?;
         }
-        File::create(file_path)?;
+
+        if !Path::new(&file_path).exists() {
+            let empty_array = json!([]);
+            let message = format!("could not create within the directory: {file_path}");
+            let mut created_file = File::create(file_path).with_context(|| message)?;
+            created_file
+                .write_all(empty_array.to_string().as_bytes())
+                .with_context(|| "could not write all into file")?;
+        }
+
         Ok(())
     }
 
-    fn update(content: &Value) -> Result<String, String> {
+    pub fn add(content: &MemorizeBox) -> Result<()> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
-        match handler.write_into_json(content) {
-            Ok(_) => Ok(String::from("Modified")),
-            Err(e) => panic!("{e}"),
+        if !handler.is_unique(&content.alias) {
+            return Err(Error::msg("Alias existed! Please set another alias!"));
         }
+        handler.write_into_json(content)?;
+        Ok(())
     }
 
-    fn collect() -> Result<(), Box<dyn std::error::Error>> {
+    pub fn update_by_alias(target: &str, new_value: &str) -> Result<()> {
         let file_path = MemorizeHelper::use_default_file();
         let handler = JSONHandler::new(&file_path);
-        let json_content = handler.read_json_from_file()?;
-        let unwrap_list = json_content
-            .iter()
-            .map(|value| serde_json::from_value(value.clone()))
-            .collect::<Result<Vec<MemorizeBox>, serde_json::Error>>();
+        handler.modify_by_alias(target, new_value)?;
+        Ok(())
+    }
 
-        println!("ALIAS\tCOMMAND");
-        if let Ok(list) = unwrap_list {
-            list.iter()
-                .for_each(|item| println!("{}\t{}", item.alias, item.command));
+    pub fn update_command_by_alias(target: &str, new_value: &str) -> Result<()> {
+        let file_path = MemorizeHelper::use_default_file();
+        let handler = JSONHandler::new(&file_path);
+        handler.modify_command_by_alias(target, new_value)?;
+        Ok(())
+    }
+
+    pub fn delete_command_by_alias(target: &str) -> Result<()> {
+        let file_path = MemorizeHelper::use_default_file();
+        let handler = JSONHandler::new(&file_path);
+        handler.delete_property_by_alias(target)?;
+        Ok(())
+    }
+
+    pub fn collect() -> Result<()> {
+        let file_path = MemorizeHelper::use_default_file();
+        let handler = JSONHandler::new(&file_path);
+        let list = handler
+            .read_json_from_file()
+            .with_context(|| "could not read conten from file")?;
+
+        let header = MemorizeHelper::use_left_aligned(vec!["ALIAS", "COMMAND"]);
+        println!("{}", header);
+        list.iter().for_each(|item| {
+            let body = format!("{:<20}\t{:<20}", item.alias, item.command);
+            println!("{}", body);
+        });
+        Ok(())
+    }
+
+    pub fn invoke_command(alias: &str) -> Result<()> {
+        let file_path = MemorizeHelper::use_default_file();
+        let handler = JSONHandler::new(&file_path);
+        let list = handler.read_json_from_file()?;
+        if let Some(index) = list.iter().position(|item| item.alias == alias) {
+            if let Some(memo) = list.get(index) {
+                let separated_parts = memo.command.split(" ").collect::<Vec<_>>();
+                let mut command = Command::new(&separated_parts[0]);
+                let excluded_first_element: Vec<_> = separated_parts.iter().skip(1).collect();
+                for arg in excluded_first_element {
+                    command.arg(arg);
+                }
+                command
+                    .spawn()
+                    .with_context(|| format!("Failed to execute command: `{}`", &memo.command))?;
+            }
         }
         Ok(())
     }

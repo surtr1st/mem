@@ -16,21 +16,21 @@ pub enum MemorizeSubcommands {
     Del {
         /// Specific command to be memorized
         #[arg(short, long)]
-        command: String,
+        alias: String,
     },
     /// Update the specific memorized command
     Set {
-        /// Specific command to be memorized
-        #[arg(short, long)]
-        command: String,
-
         /// Set alias for a command
         #[arg(short, long)]
-        alias: String,
+        alias: Option<String>,
 
-        /// Set new value for to be updated command
-        #[arg(short, long)]
-        to: String,
+        /// Set new value for alias
+        #[arg(short = 'n', long)]
+        new_alias: Option<String>,
+
+        /// Set new value for command
+        #[arg(short = 'N', long)]
+        new_command: Option<String>,
     },
     /// Execute the target memorized command by its alias
     Use {
