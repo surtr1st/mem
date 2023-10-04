@@ -6,7 +6,7 @@ use helpers::MemorizeHelper;
 use serde::{Deserialize, Serialize};
 use std::{fs, fs::File, path::Path};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct MemorizeBox {
     pub alias: String,
     pub command: String,

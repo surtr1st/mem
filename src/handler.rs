@@ -1,4 +1,7 @@
-use std::fs::{File, OpenOptions};
+use std::{
+    fs::{File, OpenOptions},
+    io::{Read, Write},
+};
 
 use crate::MemorizeBox;
 
@@ -20,13 +23,22 @@ impl<'j> JSONHandler<'j> {
     }
 
     pub fn write_into_json(self, content: &MemorizeBox) -> Result<(), std::io::Error> {
-        let file = OpenOptions::new()
+        let mut file = OpenOptions::new()
+            .read(true)
             .write(true)
             .create(true)
-            .truncate(true)
             .open(self.file_path)?;
-        let writer = std::io::BufWriter::new(file);
-        serde_json::to_writer_pretty(writer, content)?;
+
+        let mut existing_content = String::new();
+        file.read_to_string(&mut existing_content)?;
+
+        let mut memorize_boxes: Vec<MemorizeBox> = serde_json::from_str(&existing_content)?;
+
+        memorize_boxes.push(content.clone());
+
+        let updated_content = serde_json::to_string_pretty(&memorize_boxes)?;
+        let mut writer = std::io::BufWriter::new(file);
+        writer.write_all(updated_content.as_bytes())?;
         Ok(())
     }
 }
