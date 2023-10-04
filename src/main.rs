@@ -5,7 +5,7 @@ use mem::{MemorizeBox, MemorizeUtils};
 use subcommands::MemorizeSubcommands;
 
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(author, version, about = "A CLI tool used for `memorize` command-lines", long_about = None)]
 struct Memorize {
     #[command(subcommand)]
     subcommands: Option<MemorizeSubcommands>,
