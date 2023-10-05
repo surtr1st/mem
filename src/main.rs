@@ -2,7 +2,7 @@ mod subcommands;
 use anyhow::{Error, Result};
 use clap::{command, Parser};
 use mem::{MemorizeBox, MemorizeUtils};
-use subcommands::{GlobalArgs, MemorizeSubcommands};
+use subcommands::MemorizeSubcommands;
 
 #[derive(Parser, Debug)]
 #[command(author, version)]
@@ -12,8 +12,8 @@ struct Memorize {
     #[command(subcommand)]
     subcommands: Option<MemorizeSubcommands>,
 
-    #[command(flatten)]
-    options: GlobalArgs,
+    /// Alias for `x` usage
+    alias: Option<String>,
 
     /// Executing a memorized command
     x: Option<String>,
@@ -24,41 +24,32 @@ fn main() -> Result<()> {
 
     MemorizeUtils::validate_default_path()?;
 
-    let alias = mem.options.alias;
-    let command = mem.options.command;
     let exec = mem.x;
+    let x_alias = mem.alias;
 
     if let Some(_) = exec {
-        let Some(a) = &alias else {
+        let Some(alias) = &x_alias else {
             return Err(Error::msg("You haven't choose a (an) alias/command!"));
         };
-        MemorizeUtils::invoke_command(&a, &None)?;
+        MemorizeUtils::invoke_command(&alias, &None)?;
         return Ok(());
     }
 
     match &mem.subcommands {
-        Some(MemorizeSubcommands::Add) => {
-            let Some(a) = alias else {
-                return Err(Error::msg("Alias is empty!"));
-            };
-            let Some(c) = command else {
-                return Err(Error::msg("Command is empty!"));
-            };
+        Some(MemorizeSubcommands::Add { alias, command }) => {
             let memo_box = MemorizeBox {
-                alias: a.to_string(),
-                command: c.to_string(),
+                alias: alias.to_owned(),
+                command: command.to_owned(),
             };
             MemorizeUtils::add(&memo_box)?;
             Ok(())
         }
-        Some(MemorizeSubcommands::Del) => {
-            let Some(a) = alias else {
-                return Err(Error::msg("Alias is empty!"));
-            };
-            MemorizeUtils::delete_command_by_alias(&a)?;
+        Some(MemorizeSubcommands::Del { alias }) => {
+            MemorizeUtils::delete_command_by_alias(&alias)?;
             Ok(())
         }
         Some(MemorizeSubcommands::Set {
+            alias,
             new_alias,
             new_command,
         }) => {
@@ -73,7 +64,7 @@ fn main() -> Result<()> {
             }
             Ok(())
         }
-        Some(MemorizeSubcommands::Use { value }) => {
+        Some(MemorizeSubcommands::Use { alias, value }) => {
             let Some(a) = alias else {
                 return Err(Error::msg("You haven't choose a (an) alias/command!"));
             };
@@ -85,10 +76,10 @@ fn main() -> Result<()> {
             Ok(())
         }
         None => {
-            let Some(a) = alias else {
+            let Some(alias) = x_alias else {
                 return Err(Error::msg("You haven't choose a (an) alias/command!"));
             };
-            MemorizeUtils::invoke_command(&a, &None)?;
+            MemorizeUtils::invoke_command(&alias, &None)?;
             Ok(())
         }
     }

@@ -5,7 +5,7 @@
 ## Basic usage
 
 ```bash
-Usage: mem [COMMAND] [ALIAS] [X] [COMMAND]
+Usage: mem [ALIAS] [X] [COMMAND]
 
 Commands:
   add   Adding and memorize command
@@ -16,9 +16,8 @@ Commands:
   help  Print this message or the help of the given subcommand(s)
 
 Arguments:
-  [COMMAND]  Specific command to be memorized
-  [ALIAS]    Set alias for a command
-  [X]        Executing a memorized command
+  [ALIAS]  Alias for `x` usage
+  [X]      Executing a memorized command
 
 Options:
   -h, --help     Print help
@@ -28,17 +27,17 @@ Options:
 ### Adding execute only command
 
 ```bash
-mem add --command "nmcli device wifi list" --alias list-wifi
+mem add --command "nmcli device wifi list" --alias wifis
 
 ```
 
 #### Run a specific command
 
 ```bash
-mem use list-wifi
+mem use wifis
 
 # For short
-mem x list-wifi
+mem wifis
 
 ```
 

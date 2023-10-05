@@ -1,16 +1,29 @@
-use clap::{arg, command, Args, Subcommand};
+use clap::{arg, Subcommand};
 
 #[derive(Subcommand, Debug)]
 pub enum MemorizeSubcommands {
     /// Adding and memorize command
-    #[command(arg_required_else_help = true)]
-    Add,
+    Add {
+        /// Specific command to be memorized
+        #[arg(short, long)]
+        command: String,
+
+        /// Set alias for a command
+        #[arg(short, long)]
+        alias: String,
+    },
     /// Delete the specific memorized command
-    #[command(arg_required_else_help = true)]
-    Del,
+    Del {
+        /// Specific command to be memorized
+        #[arg(short, long)]
+        alias: String,
+    },
     /// Update the specific memorized command
-    #[command(arg_required_else_help = true)]
     Set {
+        /// Set alias for a command
+        #[arg(short, long)]
+        alias: Option<String>,
+
         /// Set new value for alias
         #[arg(short = 'n', long)]
         new_alias: Option<String>,
@@ -21,19 +34,13 @@ pub enum MemorizeSubcommands {
     },
     /// Execute the target memorized command by its alias
     Use {
+        /// Set alias for a command
+        alias: Option<String>,
+
         /// Set value for a command
         #[arg(short = 'v', long)]
         value: Option<String>,
     },
     /// Show a list of memorized commands and its alias
     List,
-}
-
-#[derive(Args, Debug)]
-pub struct GlobalArgs {
-    /// Specific command to be memorized
-    pub command: Option<String>,
-
-    /// Set alias for a command
-    pub alias: Option<String>,
 }
