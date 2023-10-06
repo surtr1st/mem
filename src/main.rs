@@ -1,7 +1,7 @@
 mod subcommands;
 use anyhow::{Error, Result};
 use clap::{command, Parser};
-use mem::{MemorizeBox, MemorizeUtils};
+use memo::{MemorizeBox, MemorizeUtils};
 use subcommands::MemorizeSubcommands;
 
 #[derive(Parser, Debug)]

@@ -1,11 +1,11 @@
 ## About
 
-- The command-line utility __mem (Memorize)__ is used to store and run memorized command-lines. The basic objective of this command is to attempt to memorize long, difficult-to-remember command lines, store them in a specific location, and then execute the desired command that was memorized.
+- The command-line utility __memo (Memorize)__ is used to store and run memorized command-lines. The basic objective of this command is to attempt to memorize long, difficult-to-remember command lines, store them in a specific location, and then execute the desired command that was memorized.
 
 ## Basic usage
 
 ```bash
-Usage: mem [ALIAS] [X] [COMMAND]
+Usage: memo [ALIAS] [X] [COMMAND]
 
 Commands:
   add   Adding and memorize command
@@ -27,17 +27,15 @@ Options:
 ### Adding execute only command
 
 ```bash
-mem add --command "nmcli device wifi list" --alias wifis
-
+memo add --command "nmcli device wifi list" --alias wifis
 ```
 
 #### Run a specific command
 
 ```bash
-mem use wifis
+memo use wifis
 
 # For short
-mem wifis
-
+memo wifis
 ```
 
